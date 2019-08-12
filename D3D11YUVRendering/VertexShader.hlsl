@@ -24,5 +24,8 @@ struct VS_OUTPUT
 //--------------------------------------------------------------------------------------
 VS_OUTPUT VS(VS_INPUT input)
 {
-    return input;
+	VS_OUTPUT Output;
+	Output.Pos = input.Pos;
+	Output.Tex = input.Tex;
+	return Output;
 }

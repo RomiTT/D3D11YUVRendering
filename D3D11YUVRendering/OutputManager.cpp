@@ -57,6 +57,9 @@ OUTPUTMANAGER::OUTPUTMANAGER() : m_SwapChain(nullptr),
                                  m_PixelShader(nullptr),
                                  m_InputLayout(nullptr),
                                  m_SharedSurf(nullptr),
+																 m_SharedSurfY(nullptr),
+																 m_SharedSurfU(nullptr),
+																 m_SharedSurfV(nullptr),
                                  m_WindowHandle(nullptr),
                                  m_NeedsResize(false),
                                  m_OcclusionCookie(0)
@@ -348,23 +351,49 @@ DUPL_RETURN OUTPUTMANAGER::CreateSharedSurf(_Out_ RECT* DeskBounds)
     // Create shared texture for all duplication threads to draw into
     D3D11_TEXTURE2D_DESC DeskTexD;
     RtlZeroMemory(&DeskTexD, sizeof(D3D11_TEXTURE2D_DESC));
-    DeskTexD.Width = DeskBounds->right - DeskBounds->left;
-    DeskTexD.Height = DeskBounds->bottom - DeskBounds->top;
+		DeskTexD.Width = 1366;// DeskBounds->right - DeskBounds->left;
+		DeskTexD.Height = 768;//DeskBounds->bottom - DeskBounds->top;
     DeskTexD.MipLevels = 1;
     DeskTexD.ArraySize = 1;
-    DeskTexD.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		DeskTexD.Format = DXGI_FORMAT_B8G8R8A8_UNORM;//DXGI_FORMAT_B8G8R8A8_UNORM;
     DeskTexD.SampleDesc.Count = 1;
-    DeskTexD.Usage = D3D11_USAGE_DEFAULT;
-    DeskTexD.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-    DeskTexD.CPUAccessFlags = 0;
+		DeskTexD.Usage = D3D11_USAGE_DYNAMIC;//D3D11_USAGE_DEFAULT;
+    DeskTexD.BindFlags = /*D3D11_BIND_RENDER_TARGET | */D3D11_BIND_SHADER_RESOURCE;
+		DeskTexD.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;//0;
 
     hr = m_Device->CreateTexture2D(&DeskTexD, nullptr, &m_SharedSurf);
     if (FAILED(hr))
     {
         return ProcessFailure(m_Device, L"Failed to create shared texture", L"Error", hr, SystemTransitionsExpectedErrors);
     }
-	return CreateAccessibleSurf(DeskBounds, DeskTexD.Format);
 
+		hr = CreateAccessibleSurf(DeskBounds, DeskTexD.Format);
+		if (FAILED(hr))
+		{
+			return ProcessFailure(m_Device, L"Failed to create shared texture", L"Error", hr, SystemTransitionsExpectedErrors);
+		}
+
+
+		DeskTexD.Format = DXGI_FORMAT_R8_UINT;
+		hr = m_Device->CreateTexture2D(&DeskTexD, nullptr, &m_SharedSurfY);
+		if (FAILED(hr))
+		{
+			return ProcessFailure(m_Device, L"Failed to create shared texture", L"Error", hr, SystemTransitionsExpectedErrors);
+		}
+
+		//DeskTexD.Width /= 2;
+		//DeskTexD.Height /= 2;
+		//hr = m_Device->CreateTexture2D(&DeskTexD, nullptr, &m_SharedSurfU);
+		//if (FAILED(hr))
+		//{
+		//	return ProcessFailure(m_Device, L"Failed to create shared texture", L"Error", hr, SystemTransitionsExpectedErrors);
+		//}
+
+		//hr = m_Device->CreateTexture2D(&DeskTexD, nullptr, &m_SharedSurfV);
+
+
+
+	return CreateAccessibleSurf(DeskBounds, DeskTexD.Format);
     //return DUPL_RETURN_SUCCESS;
 }
 

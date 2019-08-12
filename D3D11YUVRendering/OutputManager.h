@@ -71,8 +71,16 @@ class OUTPUTMANAGER
 
 	// Vars
 		ID3D11Device* m_Device;
-        ID3D11Texture2D* m_SharedSurf;
+    ID3D11Texture2D* m_SharedSurf;
+		ID3D11Texture2D* m_SharedSurfY;
+		ID3D11Texture2D* m_SharedSurfU;
+		ID3D11Texture2D* m_SharedSurfV;
+
 		ID3D11Texture2D* m_AccessibleSurf;
+		ID3D11Texture2D* m_AccessibleSurfY;
+		ID3D11Texture2D* m_AccessibleSurfU;
+		ID3D11Texture2D* m_AccessibleSurfV;
+
 		ID3D11DeviceContext* m_DeviceContext;
 		IDXGISwapChain1* m_SwapChain;
 
